@@ -269,7 +269,7 @@ class DACVAECodec:
     def encode_file(self, path: str | Path) -> torch.Tensor:
         try:
             wav, sr = torchaudio.load(str(path))
-        except RuntimeError:
+        except (RuntimeError, ImportError):
             import soundfile as sf
 
             data, sr = sf.read(str(path), dtype="float32")

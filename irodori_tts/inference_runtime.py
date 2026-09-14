@@ -1548,7 +1548,7 @@ def clear_cached_runtime() -> None:
 def _load_audio(path: str | Path) -> tuple[torch.Tensor, int]:
     try:
         return torchaudio.load(str(path))
-    except RuntimeError:
+    except (RuntimeError, ImportError):
         import soundfile as sf
 
         data, sr = sf.read(str(path), dtype="float32")
@@ -1566,7 +1566,7 @@ def save_wav(path: str | Path, audio: torch.Tensor, sample_rate: int) -> Path:
     audio_cpu = audio.detach().to(device="cpu", dtype=torch.float32)
     try:
         torchaudio.save(str(out_path), audio_cpu, sample_rate)
-    except RuntimeError:
+    except (RuntimeError, ImportError):
         import soundfile as sf
 
         audio_np = audio_cpu.squeeze(0).numpy() if audio_cpu.shape[0] == 1 else audio_cpu.T.numpy()

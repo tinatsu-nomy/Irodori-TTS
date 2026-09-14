@@ -20,7 +20,7 @@ dependencies = [
     "silentcipher @ git+https://github.com/SesameAILabs/silentcipher.git@d46d7d0893a583d8968ab3a6626e2289faec9152",
     "torch>=2.10.0",
     "torchaudio>=2.10.0",
-    "torchcodec>=0.10.0,<0.11.0",
+    "torchcodec>=0.10.0,<0.11.0; platform_machine != 'aarch64'",
     "transformers>=5.12.1,<6",
     "tqdm>=4.67.3",
     "wandb>=0.17.0",
@@ -32,19 +32,25 @@ cpu = [
     "torch>=2.10.0,<2.11.0",
     "torchao>=0.16.0,<0.17.0",
     "torchaudio>=2.10.0,<2.11.0",
-    "torchcodec>=0.10.0,<0.11.0",
+    "torchcodec>=0.10.0,<0.11.0; platform_machine != 'aarch64'",
 ]
 cu128 = [
     "torch>=2.10.0,<2.11.0",
     "torchao>=0.16.0,<0.17.0",
     "torchaudio>=2.10.0,<2.11.0",
-    "torchcodec>=0.10.0,<0.11.0",
+    "torchcodec>=0.10.0,<0.11.0; platform_machine != 'aarch64'",
+]
+cu130 = [
+    "torch>=2.10.0,<2.11.0",
+    "torchao>=0.16.0,<0.17.0",
+    "torchaudio>=2.10.0,<2.11.0",
+    "torchcodec>=0.10.0,<0.11.0; platform_machine != 'aarch64'",
 ]
 rocm = [
     "torch>=2.10.0,<2.11.0",
     "torchao>=0.16.0,<0.17.0",
     "torchaudio>=2.10.0,<2.11.0",
-    "torchcodec>=0.10.0,<0.11.0",
+    "torchcodec>=0.10.0,<0.11.0; platform_machine != 'aarch64'",
     "pytorch-triton-rocm>=3.5.1; sys_platform == 'linux'",
     "triton-rocm>=3.6.0; sys_platform == 'linux'",
 ]
@@ -52,7 +58,7 @@ xpu = [
     "torch>=2.10.0,<2.11.0; sys_platform == 'linux' or sys_platform == 'win32'",
     "torchao>=0.16.0,<0.17.0; sys_platform == 'linux' or sys_platform == 'win32'",
     "torchaudio>=2.10.0,<2.11.0; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torchcodec>=0.10.0,<0.11.0; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torchcodec>=0.10.0,<0.11.0; (sys_platform == 'linux' or sys_platform == 'win32') and platform_machine != 'aarch64'",
     "triton-xpu==3.6.0; sys_platform == 'linux' or sys_platform == 'win32'",
 ]
 dev = [
@@ -64,6 +70,7 @@ conflicts = [
     [
         { extra = "cpu" },
         { extra = "cu128" },
+        { extra = "cu130" },
         { extra = "rocm" },
         { extra = "xpu" },
     ],
@@ -73,11 +80,13 @@ conflicts = [
 torch = [
     { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { index = "pytorch-cu130", extra = "cu130", marker = "sys_platform == 'linux' and platform_machine == 'aarch64'" },
     { index = "pytorch-rocm", extra = "rocm", marker = "sys_platform == 'linux'" },
     { index = "pytorch-xpu", extra = "xpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
 torchaudio = [
     { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { index = "pytorch-cu130", extra = "cu130", marker = "sys_platform == 'linux' and platform_machine == 'aarch64'" },
     { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { index = "pytorch-rocm", extra = "rocm", marker = "sys_platform == 'linux'" },
     { index = "pytorch-xpu", extra = "xpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
@@ -101,6 +110,11 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [[tool.uv.index]]
