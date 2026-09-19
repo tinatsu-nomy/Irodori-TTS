@@ -6,7 +6,38 @@
 
 Training and inference code for **Irodori-TTS**, a Flow Matching-based Text-to-Speech model. The architecture and training design largely follow [Echo-TTS](https://jordandarefsky.com/blog/2025/echo/), using [DACVAE](https://github.com/facebookresearch/dacvae) continuous latents as the generation target.
 
-For an OpenAI-compatible inference API server, see [Irodori-TTS-Server](https://github.com/Aratako/Irodori-TTS-Server).
+For an OpenAI-compatible inference API server with Linux/aarch64 CUDA 13 support,
+see [Irodori-TTS-Server](https://github.com/tinatsu-nomy/Irodori-TTS-Server/tree/aarch64).
+
+> [!IMPORTANT]
+> ## Linux aarch64 / CUDA 13 branch
+>
+> This `aarch64` branch is maintained for Linux/aarch64 systems with
+> NVIDIA CUDA 13, primarily tested on NVIDIA DGX Spark / GB10.
+>
+> This branch is not intended to be merged into upstream `main`.
+>
+> Tested environment:
+>
+> - Linux aarch64
+> - NVIDIA DGX Spark / GB10
+> - CUDA 13.0
+> - PyTorch 2.10.0+cu130
+> - torchaudio 2.10.0+cu130
+> - Python 3.10
+>
+> TorchCodec is not installed on aarch64. Audio loading and saving fall
+> back to SoundFile when torchaudio requires TorchCodec.
+>
+> Currently verified:
+>
+> - VoiceDesign
+> - Reference-audio inference
+> - Multiple Reference Clips
+> - CUDA inference on GB10
+> - SoundFile fallback without TorchCodec
+>
+> Other inference/training features have not yet been validated on aarch64.
 
 > [!IMPORTANT]
 > `main` tracks the **v4/v4.1** codebase, including MeanFlow and the forthcoming v4-Large model.
@@ -49,15 +80,19 @@ Audio is represented as continuous latent sequences via the codec configured by 
 ## Installation
 
 ```bash
-git clone https://github.com/Aratako/Irodori-TTS.git
+git clone -b aarch64 https://github.com/tinatsu-nomy/Irodori-TTS.git
 cd Irodori-TTS
-uv sync --extra cu128  # NVIDIA CUDA 12.8 (Linux/Windows)
+
+uv sync --extra cu130
 ```
 
 If you want to explicitly select a PyTorch backend, use one of the backend
 extras below:
 
 ```bash
+# NVIDIA CUDA 13.0 on Linux/aarch64
+uv sync --extra cu130
+
 # NVIDIA CUDA 12.8 on Linux/Windows
 uv sync --extra cu128
 
@@ -77,9 +112,12 @@ Linux, and the `xpu` extra uses the PyTorch XPU index on Linux/Windows.
 The `cpu` extra uses the CPU PyTorch index on Linux/Windows and falls
 back to the standard PyPI PyTorch wheels on macOS.
 
-After syncing with a backend extra, use `uv run --no-sync ...` for the commands
+After syncing with a backend extra, use **`uv run --no-sync ...`** for the commands
 below to avoid re-syncing the environment without the selected PyTorch backend
 extra.
+
+The `cu130` backend is intended for Linux/aarch64 CUDA 13 systems.
+It has been tested on NVIDIA DGX Spark / GB10.
 
 The `rocm` extra includes `pytorch-triton-rocm` because `triton-rocm` alone does
 not provide `triton.language` for the `transformers` to `torch._dynamo` import
@@ -546,6 +584,14 @@ Irodori-TTS/
     ├── train_500m.yaml                       # 500M v1 model config
     └── train_2.5b.yaml                       # 2.5B parameter model config
 ```
+
+### DGX Spark note
+
+PyTorch 2.10.0+cu130 may emit a warning that GB10 compute capability
+12.1 is newer than the wheel's reported maximum capability 12.0.
+
+CUDA tensor operations and Irodori-TTS inference have been verified to
+work on the tested DGX Spark system despite this warning.
 
 ## License
 
